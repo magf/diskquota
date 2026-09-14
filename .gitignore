@@ -6,13 +6,7 @@ tmp/
 # Build directory
 build*/
 
-# The tests results
-results/
-
-# For IDE/Editors
-.vscode
-.idea
-tags
+	@@ -11,3 +16,19 @@ tags
 cscope*
 .ccls-cache/
 compile_commands.json
