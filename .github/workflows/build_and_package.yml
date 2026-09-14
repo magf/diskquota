@@ -29,7 +29,7 @@ jobs:
             gp_version: 7
     runs-on: ubuntu-24.04
     env:
-      GGDB_IMAGE:   ghcr.io/greengagedb/ggdb${{ matrix.gp_versionn}}_${{ matrix.target_os}}${{ matrix.target_os_version != '22.04' && matrix.target_os_version || '' }}
+      GGDB_IMAGE:   ghcr.io/greengagedb/greengage/ggdb${{ matrix.gp_versionn}}_${{ matrix.target_os}}${{ matrix.target_os_version != '22.04' && matrix.target_os_version || '' }}
       DEB_PACKAGES: deb-packages-greengage${{ matrix.gp_version }}-diskquota-${{ matrix.target_os }}${{ matrix.target_os_version }}
 
     steps:
