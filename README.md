@@ -112,6 +112,37 @@ Build and install:
 make install
 ```
 
+## Building a DEB package
+
+`.deb` packages are built per GPDB major version using debhelper
+(`debian/`, `package.mk`), not `cpack`. See
+[debian/README.md](debian/README.md) for the full packaging reference
+(environment variables, generated files, build flow).
+
+Local build in a container (recommended — no need to install the
+Greengage build toolchain on the host):
+
+```
+GP_MAJORVERSION=6 ci/build_in_docker_local.sh
+```
+
+Local build on a host with Greengage already installed:
+
+```
+export GP_MAJORVERSION=6
+export PG_HOME=/opt/greengagedb/greengage${GP_MAJORVERSION}
+
+make -f package.mk pkg
+```
+
+Repeat with `GP_MAJORVERSION=7` for the GP7 package. Resulting
+`.deb`/`.ddeb`/`.buildinfo`/`.changes` land in `./Package/`.
+
+CI builds GP6 (Ubuntu 22.04, 24.04) and GP7 (Ubuntu 22.04) via
+`.github/workflows/build_and_package.yml`, running the same
+`ci/build_in_docker.sh` inside the matching Greengage developer image
+(`ghcr.io/greengagedb/greengage/ggdb<version>_<os>`).
+
 2. Create database to store global information.
 ```
 create database diskquota;
@@ -316,4 +347,3 @@ If rejectmap shared memory is full, it's possible to load data into some
 schemas or roles which quota limit are reached.
 If active table shared memory is full, disk quota worker may failed to detect
 the corresponding disk usage change in time.
-
