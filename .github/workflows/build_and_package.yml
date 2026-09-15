@@ -43,14 +43,9 @@ jobs:
           SRC: /home/gpadmin/diskquota
           PATH: /opt/greengagedb/greengage${{ matrix.gp_version }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
           GP_MAJORVERSION: ${{ matrix.gp_version }}
-          GREENGAGE_REPO_URL: https://greengagedb.org
 
         run: |
           set -eux
-          # Fix for old stable images w/o Greengage GPG
-          curl -fsSL ${GREENGAGE_REPO_URL}/repositories/gpg 2>curl.err | \
-            sudo gpg --dearmor -o /etc/apt/keyrings/greengagedb.gpg 1>gpg.log 2>>gpg.err || \
-            (echo -e "### ❌ Error: ${GREENGAGE_REPO_URL} GPG installation\n$(cat curl.err gpg.{err,log})\n\n" ; exit 1)
           docker run \
             --rm \
             -v /etc/apt/keyrings/greengagedb.gpg:/etc/apt/keyrings/greengagedb.gpg \
