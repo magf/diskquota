@@ -48,7 +48,6 @@ jobs:
           set -eux
           docker run \
             --rm \
-            -v /etc/apt/keyrings/greengagedb.gpg:/etc/apt/keyrings/greengagedb.gpg \
             -v ${{ github.workspace }}:$SRC \
             -w $SRC \
             -e PG_HOME \
