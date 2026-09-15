@@ -30,7 +30,7 @@ container environment and calls `make -f package.mk pkg`.
 
 ## Build Flow
 
-```
+```text
 make -f package.mk pkg
                     ↓
 version-vars (reads ./VERSION)
@@ -131,6 +131,7 @@ The unprefixed name is used because there is a single binary package.
 | --- | --- |
 | `package.mk` | Version, control/changelog generation, packaging targets |
 | `ci/build_in_docker.sh` | Runs the full build inside a Greengage container image |
+| `ci/build_in_docker_local.sh` | Wrapper for local development (see Usage below) |
 | `VERSION` | Package version string, read by `version-vars` |
 | `debian/control.in` | `debian/control` template, substituting `@GP_MAJORVERSION@` |
 | `debian/rules` | Debhelper overrides |
@@ -148,16 +149,14 @@ Generated (do not commit, `.gitignore`d): `debian/control`,
 ### Local build in a container (recommended)
 
 ```bash
-export GP_MAJORVERSION=6
-export PG_HOME=/opt/greengagedb/greengage${GP_MAJORVERSION}
-export GGDB_IMAGE=ghcr.io/greengagedb/greengage/ggdb${GP_MAJORVERSION}_ubuntu:latest
-export SRC=/home/gpadmin/diskquota
-
-docker run --rm -it \
-    -v ./:$SRC -w $SRC \
-    -e SRC -e PG_HOME -e GP_MAJORVERSION \
-    $GGDB_IMAGE ci/build_in_docker.sh
+GP_MAJORVERSION=6 ci/build_in_docker_local.sh
 ```
+
+The wrapper pulls the matching Greengage developer image
+(`ghcr.io/greengagedb/greengage/ggdb${GP_MAJORVERSION}_ubuntu:latest`),
+bind-mounts the source tree, runs `ci/build_in_docker.sh` inside it, and
+chowns the result back to the host user — otherwise everything under the
+bind mount would end up owned by root.
 
 Resulting `.deb`/`.ddeb`/`.buildinfo`/`.changes` land in `./Package/`.
 
