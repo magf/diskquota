@@ -20,15 +20,5 @@ compile_commands.json
 # CMake
 /obj-*/
 
-########################################
 # Packages
-########################################
-# Debian
 /Package/
-**/debian/*
-!**/debian/*.in
-!**/debian/compat
-!**/debian/copyright
-!**/debian/rules
-!**/debian/lintian-overrides
-!**/debian/README*
