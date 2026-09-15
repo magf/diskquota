@@ -1,25 +1,20 @@
 #!/bin/bash
 # FILE:    ci/build_in_docker.sh
 # CONTEXT: Build diskquota and package it as a .deb in container
-# PURPOSE: 
+# PURPOSE: Runs inside a Greengage developer image (ggdb*_ubuntu, pulled from
+#          ghcr.io/greengagedb/greengage) that already provides the build
+#          toolchain. Installs the matching Greengage runtime package via
+#          apt, then builds the diskquota .deb with `make -f package.mk pkg`.
+#          Invoked either directly by CI or via ci/build_in_docker_local.sh
+#          for local development; chowns the bind-mounted source tree back
+#          to the host user when HOST_UID/HOST_GID are provided.
 
-# Fot build in docker using stable Greengage images:
-# GGDB_IMAGE=greengagedb/ggdb6_ubuntu:latest
-# GGDB_IMAGE=greengagedb/ggdb6_ubuntu24:latest
-# GGDB_IMAGE=greengagedb/ggdb7_ubuntu:latest
-#
-# or developer Greengage images:
+# Local/manual run examples (see ci/build_in_docker_local.sh for the wrapper):
 # GGDB_IMAGE=ghcr.io/greengagedb/greengage/ggdb6_ubuntu:latest
+# GGDB_IMAGE=ghcr.io/greengagedb/greengage/ggdb6_ubuntu24.04:latest
 # GGDB_IMAGE=ghcr.io/greengagedb/greengage/ggdb7_ubuntu:latest
 
 # shellcheck disable=SC2086
-
-# USAGE:
-# export GP_MAJORVERSION=6
-# export PG_HOME=/opt/greengagedb/greengage${GP_MAJORVERSION}
-# export GGDB_IMAGE=ghcr.io/greengagedb/greengage/ggdb${GP_MAJORVERSION}_ubuntu:latest
-# export SRC=/home/gpadmin/diskquota
-# docker run --rm -it -v ./:$SRC -w $SRC -e SRC -e PG_HOME -e GP_MAJORVERSION $GGDB_IMAGE ci/build_in_docker.sh
 
 set -eux
 
@@ -71,3 +66,9 @@ fi
 
 # Package
 make -f package.mk pkg
+
+# Fix file ownership after build (root inside container -> host user)
+# Pass '-e HOST_UID=$(id -u) -e HOST_GID=$(id -g)' to 'docker run' for this
+if [[ -n "${HOST_UID:-}" && -n "${HOST_GID:-}" ]]; then
+    chown -R "${HOST_UID}:${HOST_GID}" "$SRC"
+fi
